@@ -7,6 +7,10 @@ namespace LoggingService.Models
 {
     public class DiagModel
     {
-        public bool isDbRunning { get; set;}
+        public bool IsDbRunning { get; set;}
+
+        public long MbAppUsage { get; set;}
+
+        public double CPUtime { get; set;}
     }
 }

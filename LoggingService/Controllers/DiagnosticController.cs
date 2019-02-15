@@ -6,6 +6,8 @@ using LoggingService.Models;
 using LoggingService.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using System.Diagnostics;
 
 namespace LoggingService.Controllers
 {
@@ -14,6 +16,7 @@ namespace LoggingService.Controllers
     public class DiagnosticController : ControllerBase
     {
         private readonly LogService _logService;
+
 
         public DiagnosticController(LogService logService)
         {
@@ -24,9 +27,12 @@ namespace LoggingService.Controllers
         public ActionResult<DiagModel> Get()
         {
             var diag = new DiagModel();
-            diag.isDbRunning = _logService.Ping();
+            diag.IsDbRunning = _logService.Ping();
 
+            var proc = Process.GetCurrentProcess();
+            diag.MbAppUsage = proc.WorkingSet64 / 1024 / 1024;
 
+            diag.CPUtime = proc.TotalProcessorTime.Milliseconds;
 
             return new ActionResult<DiagModel>(diag);
         }
