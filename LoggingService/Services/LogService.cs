@@ -38,7 +38,7 @@ namespace LoggingService.Services
 
         public LogModel Get(string id)
         {
-            return _logs.Find<LogModel>(book => book.Id == id).FirstOrDefault();
+            return _logs.Find<LogModel>(log => log.Id == id).FirstOrDefault();
         }
 
         public LogModel Create(LogModel log)
@@ -52,14 +52,14 @@ namespace LoggingService.Services
             _logs.ReplaceOne(book => book.Id == id, bookIn);
         }
 
-        public void Remove(LogModel bookIn)
+        public void Remove(LogModel logIn)
         {
-            _logs.DeleteOne(book => book.Id == bookIn.Id);
+            _logs.DeleteOne(log => log.Id == logIn.Id);
         }
 
         public void Remove(string id)
         {
-            _logs.DeleteOne(book => book.Id == id);
+            _logs.DeleteOne(log => log.Id == id);
         }
     }
 }
