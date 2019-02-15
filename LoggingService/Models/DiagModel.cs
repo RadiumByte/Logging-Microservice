@@ -9,8 +9,16 @@ namespace LoggingService.Models
     {
         public bool IsDbRunning { get; set;}
 
-        public long MbAppUsage { get; set;}
+        public long MemoryUsage { get; set;}
 
-        public double CPUtime { get; set;}
+        public long MemoryToBeAllocated { get; set; }
+
+        public double CPU { get; set;}
+
+        public int FreeHddPercent { get; set; }
+
+        public DateTime Date { get; set; }
+
+        public long AverageRequestTime { get; set; }
     }
 }

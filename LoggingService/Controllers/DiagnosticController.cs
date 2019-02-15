@@ -6,8 +6,9 @@ using LoggingService.Models;
 using LoggingService.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using System.Diagnostics;
+using System.IO;
+
 
 namespace LoggingService.Controllers
 {
@@ -23,6 +24,18 @@ namespace LoggingService.Controllers
             _logService = logService;
         }
 
+        public int CheckDiskSpace(string driveLetter)
+        {
+            DriveInfo drive = new DriveInfo(driveLetter);
+
+            var totalBytes = drive.TotalSize;
+            var freeBytes = drive.AvailableFreeSpace;
+
+            var freePercent = (int)((100 * freeBytes) / totalBytes);
+
+            return freePercent;
+        }
+
         [HttpGet]
         public ActionResult<DiagModel> Get()
         {
@@ -30,9 +43,16 @@ namespace LoggingService.Controllers
             diag.IsDbRunning = _logService.Ping();
 
             var proc = Process.GetCurrentProcess();
-            diag.MbAppUsage = proc.WorkingSet64 / 1024 / 1024;
+            diag.MemoryUsage = proc.WorkingSet64 / 1024 / 1024;
 
-            diag.CPUtime = proc.TotalProcessorTime.Milliseconds;
+            diag.CPU = proc.TotalProcessorTime.Milliseconds;
+
+            diag.FreeHddPercent = CheckDiskSpace(System.AppContext.BaseDirectory);
+
+            diag.MemoryToBeAllocated = GC.GetTotalMemory(true) / 1024 / 1024;
+            diag.Date = DateTime.Now;
+
+            diag.AverageRequestTime = _logService.GetRequestAverageTime();
 
             return new ActionResult<DiagModel>(diag);
         }
