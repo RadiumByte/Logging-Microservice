@@ -13,6 +13,8 @@ namespace LoggingService.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
+        public long Token { get; set; }
+
         [BsonElement("DateTime")]
         public string Date { get; set; }
 

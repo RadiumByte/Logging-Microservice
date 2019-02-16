@@ -11,6 +11,8 @@ namespace LoggingService.Controllers
     {
         private readonly LogService _logService;
 
+        private long defaultToken = 199719741969;
+
         public LogController(LogService logService)
         {
             _logService = logService;
@@ -18,63 +20,80 @@ namespace LoggingService.Controllers
 
         // Get all DB
         [HttpGet]
-        public ActionResult<List<LogModel>> Get()
+        public ActionResult<List<LogModel>> Get([FromHeader] long token)
         {
-            return _logService.Get();
+            if (token == defaultToken)
+                return _logService.Get();
+            else
+                return NoContent();
         }
 
         // Get by id
         [HttpGet("{id:length(24)}", Name = "GetLog")]
-        public ActionResult<LogModel> Get(string id)
+        public ActionResult<LogModel> Get([FromHeader] long token, string id)
         {
-            var log = _logService.Get(id);
-
-            if (log == null)
+            if (token == defaultToken)
             {
-                return NotFound();
-            }
+                var log = _logService.Get(id);
 
-            return log;
+                if (log == null)
+                {
+                    return NotFound();
+                }
+
+                return log;
+            }
+            else
+                return NoContent();
         }
 
         // Post item
         [HttpPost]
-        public ActionResult<LogModel> Create(LogModel log)
+        public ActionResult<LogModel> Create([FromHeader] long token, LogModel log)
         {
-            _logService.Create(log);
+            if (token == defaultToken)
+            {
+                _logService.Create(log);
 
-            return CreatedAtRoute("GetLog", new { id = log.Id.ToString() }, log);
+                return CreatedAtRoute("GetLog", new { id = log.Id.ToString() }, log);
+            }
+            else
+                return NoContent();     
         }
 
         // Update item by id
         [HttpPut("{id:length(24)}")]
-        public IActionResult Update(string id, LogModel logIn)
+        public IActionResult Update([FromHeader] long token, string id, LogModel logIn)
         {
-            var log = _logService.Get(id);
-
-            if (log == null)
+            if (token == defaultToken)
             {
-                return NotFound();
+                var log = _logService.Get(id);
+
+                if (log == null)
+                {
+                    return NotFound();
+                }
+
+                _logService.Update(id, logIn);   
             }
-
-            _logService.Update(id, logIn);
-
             return NoContent();
         }
 
         // Delete item by id
         [HttpDelete("{id:length(24)}")]
-        public IActionResult Delete(string id)
+        public IActionResult Delete([FromHeader] long token, string id)
         {
-            var log = _logService.Get(id);
-
-            if (log == null)
+            if (token == defaultToken)
             {
-                return NotFound();
+                var log = _logService.Get(id);
+
+                if (log == null)
+                {
+                    return NotFound();
+                }
+
+                _logService.Remove(log.Id);   
             }
-
-            _logService.Remove(log.Id);
-
             return NoContent();
         }
     }
