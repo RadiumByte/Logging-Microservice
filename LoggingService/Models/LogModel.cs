@@ -13,9 +13,11 @@ namespace LoggingService.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
-        /*
         [BsonElement("DateTime")]
-        public DateTime Date { get; set; }
+        public string Date { get; set; }
+
+        [BsonElement("Type")]
+        public string Type { get; set; }
 
         [BsonElement("User")]
         public string UserName { get; set; }
@@ -26,11 +28,7 @@ namespace LoggingService.Models
         [BsonElement("Brief")]
         public string BInfo { get; set; }
 
-        [BsonElement("Type")]
-        public string Type { get; set; }
-        */
         [BsonElement("Detailed")]
         public string DInfo { get; set; }
-        
     }
 }

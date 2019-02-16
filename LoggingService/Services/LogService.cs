@@ -20,11 +20,7 @@ namespace LoggingService.Services
 
         public LogService(IConfiguration config)
         {
-            // Don't uncomment this
-            //var url = "mongodb://localhost:27016";
-
-            var url = new MongoUrl("mongodb://localhost:27017");
-            var client = new MongoClient(url);
+            var client = new MongoClient(config.GetConnectionString("LoggerDb"));
 
             database = client.GetDatabase("LoggerDb");
             _logs = database.GetCollection<LogModel>("Logs");

@@ -16,12 +16,14 @@ namespace LoggingService.Controllers
             _logService = logService;
         }
 
+        // Get all DB
         [HttpGet]
         public ActionResult<List<LogModel>> Get()
         {
             return _logService.Get();
         }
 
+        // Get by id
         [HttpGet("{id:length(24)}", Name = "GetLog")]
         public ActionResult<LogModel> Get(string id)
         {
@@ -35,6 +37,7 @@ namespace LoggingService.Controllers
             return log;
         }
 
+        // Post item
         [HttpPost]
         public ActionResult<LogModel> Create(LogModel log)
         {
@@ -43,6 +46,7 @@ namespace LoggingService.Controllers
             return CreatedAtRoute("GetLog", new { id = log.Id.ToString() }, log);
         }
 
+        // Update item by id
         [HttpPut("{id:length(24)}")]
         public IActionResult Update(string id, LogModel logIn)
         {
@@ -58,6 +62,7 @@ namespace LoggingService.Controllers
             return NoContent();
         }
 
+        // Delete item by id
         [HttpDelete("{id:length(24)}")]
         public IActionResult Delete(string id)
         {
