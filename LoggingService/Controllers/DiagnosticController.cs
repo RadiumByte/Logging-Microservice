@@ -40,15 +40,17 @@ namespace LoggingService.Controllers
         [HttpGet]
         public ActionResult<DiagModel> Get()
         {
-            var diag = new DiagModel();
-            diag.IsDbRunning = _logService.Ping();
+            var diag = new DiagModel
+            {
+                IsDbRunning = _logService.Ping()
+            };
 
             var proc = Process.GetCurrentProcess();
             diag.MemoryUsage = proc.WorkingSet64 / 1024 / 1024;
 
             diag.CPU = proc.TotalProcessorTime.Milliseconds;
 
-            diag.FreeHddPercent = CheckDiskSpace(System.AppContext.BaseDirectory);
+            diag.FreeHddPercent = CheckDiskSpace(AppContext.BaseDirectory);
 
             diag.MemoryToBeAllocated = GC.GetTotalMemory(true) / 1024 / 1024;
             diag.Date = DateTime.Now;

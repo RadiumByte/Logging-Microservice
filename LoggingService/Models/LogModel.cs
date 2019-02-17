@@ -13,6 +13,8 @@ namespace LoggingService.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
+        // Time format:
+        // year-month-day hour:min:sec
         [BsonElement("DateTime")]
         public string Date { get; set; }
 

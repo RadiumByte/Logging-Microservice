@@ -20,9 +20,11 @@ namespace LoggingService.Controllers
         }
 
         // Get by parameter filtering:
-        // Route - /log/<type>&<user>&<sender>
+        // Route - /log/<type>&<user>&<sender>&<time>
+        // <time> is <hour>, <day>, <month>, <year>, or <>
+
         [HttpGet]
-        [Route("{parameters}")]
+        [Route("param:{parameters}", Name = "GetByParameters")]
         public ActionResult<List<LogModel>> GetByParameters([FromHeader] long token, string parameters)
         {
             if (token == defaultToken)
@@ -36,7 +38,7 @@ namespace LoggingService.Controllers
 
         // Get by id
         [HttpGet]
-        [Route("{id}")]
+        [Route("id:{id:length(24)}", Name = "GetById")]
         public ActionResult<LogModel> GetById([FromHeader] long token, string id)
         {
             if (token == defaultToken)
@@ -71,19 +73,8 @@ namespace LoggingService.Controllers
             }
         }
 
-        // Update item by id
-        [HttpPut("{id}")]
-        public IActionResult Update([FromHeader] long token, string id, LogModel logIn)
-        {
-            if (token == defaultToken)
-            { 
-                _logService.Update(id, logIn);
-            }
-            return NoContent();
-        }
-
         // Delete item by id
-        [HttpDelete("{id}")]
+        [HttpDelete("id:{id:length(24)}")]
         public IActionResult Delete([FromHeader] long token, string id)
         {
             if (token == defaultToken)
