@@ -2,49 +2,57 @@
 using LoggingService.Models;
 using LoggingService.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
 
 namespace LoggingService.Controllers
 {
-    [Route("api/log")]
+    [Route("api/[controller]")]
     [ApiController]
     public class LogController : ControllerBase
     {
         private readonly LogService _logService;
 
-        private long defaultToken = 199719741969;
+        private readonly long defaultToken = 199719741969;
 
         public LogController(LogService logService)
         {
             _logService = logService;
         }
 
-        // Get all DB
+        // Get by parameter filtering:
+        // Route - /log/<type>&<user>&<sender>
         [HttpGet]
-        public ActionResult<List<LogModel>> Get([FromHeader] long token)
+        [Route("{parameters}")]
+        public ActionResult<List<LogModel>> GetByParameters([FromHeader] long token, string parameters)
         {
             if (token == defaultToken)
-                return _logService.Get();
+                return _logService.GetByParameters(parameters);
             else
+            {
+                Thread.Sleep(1000);
                 return NoContent();
+            }         
         }
 
         // Get by id
-        [HttpGet("{id:length(24)}", Name = "GetLog")]
-        public ActionResult<LogModel> Get([FromHeader] long token, string id)
+        [HttpGet]
+        [Route("{id}")]
+        public ActionResult<LogModel> GetById([FromHeader] long token, string id)
         {
             if (token == defaultToken)
             {
-                var log = _logService.Get(id);
+                var log = _logService.GetById(id);
 
                 if (log == null)
-                {
                     return NotFound();
-                }
 
                 return log;
             }
             else
+            {
+                Thread.Sleep(1000);
                 return NoContent();
+            }         
         }
 
         // Post item
@@ -54,47 +62,35 @@ namespace LoggingService.Controllers
             if (token == defaultToken)
             {
                 _logService.Create(log);
-
-                return CreatedAtRoute("GetLog", new { id = log.Id.ToString() }, log);
+                return Created(log.Id.ToString(), log);
             }
             else
-                return NoContent();     
+            {
+                Thread.Sleep(1000);
+                return NoContent();
+            }
         }
 
         // Update item by id
-        [HttpPut("{id:length(24)}")]
+        [HttpPut("{id}")]
         public IActionResult Update([FromHeader] long token, string id, LogModel logIn)
         {
             if (token == defaultToken)
-            {
-                var log = _logService.Get(id);
-
-                if (log == null)
-                {
-                    return NotFound();
-                }
-
-                _logService.Update(id, logIn);   
+            { 
+                _logService.Update(id, logIn);
             }
             return NoContent();
         }
 
         // Delete item by id
-        [HttpDelete("{id:length(24)}")]
+        [HttpDelete("{id}")]
         public IActionResult Delete([FromHeader] long token, string id)
         {
             if (token == defaultToken)
             {
-                var log = _logService.Get(id);
-
-                if (log == null)
-                {
-                    return NotFound();
-                }
-
-                _logService.Remove(log.Id);   
+                _logService.Remove(id);   
             }
             return NoContent();
-        }
+        }      
     }
 }

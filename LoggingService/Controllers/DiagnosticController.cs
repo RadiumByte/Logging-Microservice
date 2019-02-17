@@ -24,6 +24,7 @@ namespace LoggingService.Controllers
             _logService = logService;
         }
 
+        [NonAction]
         public int CheckDiskSpace(string driveLetter)
         {
             DriveInfo drive = new DriveInfo(driveLetter);
