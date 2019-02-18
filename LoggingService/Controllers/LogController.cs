@@ -3,6 +3,7 @@ using LoggingService.Models;
 using LoggingService.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
+using System;
 
 namespace LoggingService.Controllers
 {

@@ -18,7 +18,5 @@ namespace LoggingService.Models
         public int FreeHddPercent { get; set; }
 
         public DateTime Date { get; set; }
-
-        public long AverageRequestTime { get; set; }
     }
 }

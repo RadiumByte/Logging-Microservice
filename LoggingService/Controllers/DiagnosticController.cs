@@ -55,8 +55,6 @@ namespace LoggingService.Controllers
             diag.MemoryToBeAllocated = GC.GetTotalMemory(true) / 1024 / 1024;
             diag.Date = DateTime.Now;
 
-            diag.AverageRequestTime = _logService.GetRequestAverageTime();
-
             return new ActionResult<DiagModel>(diag);
         }
     }

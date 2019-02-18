@@ -17,10 +17,6 @@ namespace LoggingService.Services
 
         private readonly int httpget_parameter_count = 4;
 
-        private long request_count = 0;
-        private long average_time = 0;
-        
-
         public LogService(IConfiguration config)
         {
             var client = new MongoClient(config.GetConnectionString("LoggerDb"));
@@ -31,20 +27,7 @@ namespace LoggingService.Services
 
         public List<LogModel> Get()
         {
-            request_count++;
-            Stopwatch timer = Stopwatch.StartNew();
-
-            var result = _logs.Find(log => true).ToList();
-
-            timer.Stop();
-            average_time = timer.ElapsedMilliseconds / request_count;
-
-            return result;
-        }
-
-        public long GetRequestAverageTime()
-        {
-            return average_time;
+            return _logs.Find(log => true).ToList();
         }
 
         public bool Ping()
@@ -54,15 +37,7 @@ namespace LoggingService.Services
 
         public LogModel GetById(string id)
         {
-            request_count++;
-            Stopwatch timer = Stopwatch.StartNew();
-
-            var result = _logs.Find(log => log.Id == id).FirstOrDefault();
-
-            timer.Stop();
-            average_time = timer.ElapsedMilliseconds / request_count;
-
-            return result;
+            return _logs.Find(log => log.Id == id).FirstOrDefault();
         }
 
         public List<LogModel> GetByParameters(string parameters)
@@ -201,26 +176,14 @@ namespace LoggingService.Services
 
         public LogModel Create(LogModel log)
         {
-            request_count++;
-            Stopwatch timer = Stopwatch.StartNew();
-
             _logs.InsertOne(log);
-
-            timer.Stop();
-            average_time = timer.ElapsedMilliseconds / request_count;
 
             return log;
         }
 
         public void Remove(string id)
         {
-            request_count++;
-            Stopwatch timer = Stopwatch.StartNew();
-
             _logs.DeleteOne(log => log.Id == id);
-
-            timer.Stop();
-            average_time = timer.ElapsedMilliseconds / request_count;
         }
     }
 }
