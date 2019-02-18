@@ -18,6 +18,7 @@ namespace LoggingService.Controllers
     {
         private readonly LogService _logService;
 
+        private readonly long defaultToken = 199719741969;
 
         public DiagnosticController(LogService logService)
         {
@@ -37,25 +38,43 @@ namespace LoggingService.Controllers
             return freePercent;
         }
 
+        /// <summary>
+        /// Gets a DiagItem.
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     GET /diag
+        ///
+        /// </remarks>
+        /// <param name="token"></param>
+        /// <returns>DiagItem</returns>
+        /// <response code="400">If token is invalid</response>
         [HttpGet]
-        public ActionResult<DiagModel> Get()
+        [ProducesResponseType(400)]
+        public ActionResult<DiagModel> Get([FromHeader] long token)
         {
-            var diag = new DiagModel
+            if (token == defaultToken)
             {
-                IsDbRunning = _logService.Ping()
-            };
+                var diag = new DiagModel
+                {
+                    IsDbRunning = _logService.Ping()
+                };
 
-            var proc = Process.GetCurrentProcess();
-            diag.MemoryUsage = proc.WorkingSet64 / 1024 / 1024;
+                var proc = Process.GetCurrentProcess();
+                diag.MemoryUsage = proc.WorkingSet64 / 1024 / 1024;
 
-            diag.CPU = proc.TotalProcessorTime.Milliseconds;
+                diag.CPU = proc.TotalProcessorTime.Milliseconds;
 
-            diag.FreeHddPercent = CheckDiskSpace(AppContext.BaseDirectory);
+                diag.FreeHddPercent = CheckDiskSpace(AppContext.BaseDirectory);
 
-            diag.MemoryToBeAllocated = GC.GetTotalMemory(true) / 1024 / 1024;
-            diag.Date = DateTime.Now;
+                diag.MemoryToBeAllocated = GC.GetTotalMemory(true) / 1024 / 1024;
+                diag.Date = DateTime.Now;
 
-            return new ActionResult<DiagModel>(diag);
+                return new ActionResult<DiagModel>(diag);
+            }
+            else
+                return BadRequest();
         }
     }
 }

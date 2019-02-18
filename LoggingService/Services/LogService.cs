@@ -42,7 +42,7 @@ namespace LoggingService.Services
 
         public List<LogModel> GetByParameters(string parameters)
         {
-            var params_parts = parameters.Split('&');
+            var params_parts = parameters.Split('$');
             if (params_parts.Count() != httpget_parameter_count)
                 return null;
 

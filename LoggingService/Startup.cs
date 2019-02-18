@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using LoggingService.Models;
 using LoggingService.Services;
 using Swashbuckle.AspNetCore.Swagger;
+using System.Reflection;
+using System.IO;
+using System;
 
 namespace LoggingService
 {
@@ -26,7 +29,26 @@ namespace LoggingService
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "Logger API", Version = "v1" });
+                c.SwaggerDoc("v1", new Info
+                {
+                    Version = "v1",
+                    Title = "Logger Micorservice",
+                    Description = "A RESTful microservice for logging",
+                    TermsOfService = "None",
+                    Contact = new Contact
+                    {
+                        Name = "Anton Fedyashov",
+                        Email = "anton.fedyashov@gmail.com",
+                    },
+                    License = new License
+                    {
+                        Name = "Use under MIT License",
+                    }
+                });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
         }
 
