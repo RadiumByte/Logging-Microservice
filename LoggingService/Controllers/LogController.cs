@@ -22,7 +22,7 @@ namespace LoggingService.Controllers
 
         /// <summary>
         /// Gets a LogItem by parameter filtering.
-        /// Filter structure: [type]$[user]$[sender]$[time].
+        /// Filter structure: [type]$[user]$[sender]$[time]$[count].
         /// There [time] is [hour], or [day], or [month], or [year], or []
         /// </summary>
         /// <remarks>

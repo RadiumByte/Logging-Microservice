@@ -15,7 +15,7 @@ namespace LoggingService.Services
         private readonly IMongoCollection<LogModel> _logs;
         private IMongoDatabase database;
 
-        private readonly int httpget_parameter_count = 4;
+        private readonly int httpget_parameter_count = 5;
 
         public LogService(IConfiguration config)
         {
@@ -46,132 +46,59 @@ namespace LoggingService.Services
             if (params_parts.Count() != httpget_parameter_count)
                 return null;
 
-            List<LogModel> result = _logs.Find(log => true).ToList();
-            var type = params_parts[0];
-            var user_name = params_parts[1];
-            var sender = params_parts[2];
-            var time_type = params_parts[3];
+            var result = _logs.Find(log => true).ToEnumerable();
+            string type = params_parts[0];
+            string user_name = params_parts[1];
+            string sender = params_parts[2];
+            string time_type = params_parts[3];
+            int count = int.Parse(params_parts[4]);
 
-            if (type != "")
-                result = result.Where(log => log.Type == type).ToList();
-            if (user_name != "")
-                result = result.Where(log => log.UserName == user_name).ToList();
-            if (sender != "")
-                result = result.Where(log => log.SenderApp == sender).ToList();
+            result = result.Where(log =>
+            {
+                return 
+                type == "" ? true : log.Type == type && 
+                user_name == "" ? true : log.UserName == user_name && 
+                sender == "" ? true : log.SenderApp == sender;
+            });
 
             if (time_type != "")
             {
-                if (time_type == "hour")
+                result = result.Where(log =>
                 {
-                    result = result.Where(log =>
-                    {
-                        var date_parts = log.Date.Split(' ');
-                        var left_parts = date_parts[0].Split('-');
-                        var right_parts = date_parts[1].Split(':');
+                    var date_parts = log.Date.Split(' ');
+                    var left_parts = date_parts[0].Split('-');
+                    var right_parts = date_parts[1].Split(':');
 
-                        int year = int.Parse(left_parts[0]);
-                        int month = int.Parse(left_parts[1]);
-                        int day = int.Parse(left_parts[2]);
-                        int hour = int.Parse(right_parts[0]);
-                        int min = int.Parse(right_parts[1]);
-                        int sec = int.Parse(right_parts[2]);
+                    int year = int.Parse(left_parts[0]);
+                    int month = int.Parse(left_parts[1]);
+                    int day = int.Parse(left_parts[2]);
+                    int hour = int.Parse(right_parts[0]);
+                    int min = int.Parse(right_parts[1]);
+                    int sec = int.Parse(right_parts[2]);
 
-                        DateTime actual = DateTime.Now;
-                        DateTime border = actual.AddHours(-1);
+                    DateTime actual = DateTime.Now;
+                    DateTime border = DateTime.Now;
 
-                        DateTime current_log = new DateTime(year, month, day, hour, min, sec);
+                    if (time_type == "hour")
+                        border = actual.AddHours(-1);
+                    else if (time_type == "day")
+                        border = actual.AddDays(-1);
+                    else if (time_type == "month")
+                        border = actual.AddMonths(-1);
+                    else if (time_type == "year")
+                        border = actual.AddYears(-1);
 
-                        if (current_log >= border)
-                            return true;
-                        else
-                            return false;
-                    }     
-                    ).ToList();
+                    DateTime current_log = new DateTime(year, month, day, hour, min, sec);
+
+                    if (current_log >= border)
+                        return true;
+                    else
+                        return false;
                 }
-                else if (time_type == "day")
-                {
-                    result = result.Where(log =>
-                    {
-                        var date_parts = log.Date.Split(' ');
-                        var left_parts = date_parts[0].Split('-');
-                        var right_parts = date_parts[1].Split(':');
-
-                        int year = int.Parse(left_parts[0]);
-                        int month = int.Parse(left_parts[1]);
-                        int day = int.Parse(left_parts[2]);
-                        int hour = int.Parse(right_parts[0]);
-                        int min = int.Parse(right_parts[1]);
-                        int sec = int.Parse(right_parts[2]);
-
-                        DateTime actual = DateTime.Now;
-                        DateTime border = actual.AddDays(-1);
-
-                        DateTime current_log = new DateTime(year, month, day, hour, min, sec);
-
-                        if (current_log >= border)
-                            return true;
-                        else
-                            return false;
-                    }
-                    ).ToList();
-                }
-                else if (time_type == "month")
-                {
-                    result = result.Where(log =>
-                    {
-                        var date_parts = log.Date.Split(' ');
-                        var left_parts = date_parts[0].Split('-');
-                        var right_parts = date_parts[1].Split(':');
-
-                        int year = int.Parse(left_parts[0]);
-                        int month = int.Parse(left_parts[1]);
-                        int day = int.Parse(left_parts[2]);
-                        int hour = int.Parse(right_parts[0]);
-                        int min = int.Parse(right_parts[1]);
-                        int sec = int.Parse(right_parts[2]);
-
-                        DateTime actual = DateTime.Now;
-                        DateTime border = actual.AddMonths(-1);
-
-                        DateTime current_log = new DateTime(year, month, day, hour, min, sec);
-
-                        if (current_log >= border)
-                            return true;
-                        else
-                            return false;
-                    }
-                    ).ToList();
-                }
-                else if (time_type == "year")
-                {
-                    result = result.Where(log =>
-                    {
-                        var date_parts = log.Date.Split(' ');
-                        var left_parts = date_parts[0].Split('-');
-                        var right_parts = date_parts[1].Split(':');
-
-                        int year = int.Parse(left_parts[0]);
-                        int month = int.Parse(left_parts[1]);
-                        int day = int.Parse(left_parts[2]);
-                        int hour = int.Parse(right_parts[0]);
-                        int min = int.Parse(right_parts[1]);
-                        int sec = int.Parse(right_parts[2]);
-
-                        DateTime actual = DateTime.Now;
-                        DateTime border = actual.AddYears(-1);
-
-                        DateTime current_log = new DateTime(year, month, day, hour, min, sec);
-
-                        if (current_log >= border)
-                            return true;
-                        else
-                            return false;
-                    }
-                    ).ToList();
-                }
+                );
             }
 
-            return result;
+            return result.TakeLast(count).ToList();
         }
 
         public LogModel Create(LogModel log)
